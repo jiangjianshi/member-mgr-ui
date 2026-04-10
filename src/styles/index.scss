@@ -1,0 +1,164 @@
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.app-container {
+  height: 100%;
+}
+
+// 布局样式
+.main-container {
+  display: flex;
+  height: 100%;
+}
+
+.sidebar {
+  width: 200px;
+  background: #304156;
+  overflow-y: auto;
+  
+  .el-menu {
+    border: none;
+  }
+  
+  .el-menu-item {
+    color: #bfcbd9;
+    
+    &:hover {
+      background: #263445;
+    }
+    
+    &.is-active {
+      color: #409eff;
+      background: #1f2d3d;
+    }
+  }
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-header {
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f5f7fa;
+}
+
+// 卡片和表格通用样式
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  .page-title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.data-card {
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  display: inline-block;
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  
+  .stat-label {
+    font-size: 14px;
+    color: #909399;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+// 表单样式
+.form-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 4px;
+}
+
+// 状态标签
+.status-tag {
+  &.normal { color: #67c23a; }
+  &.frozen { color: #e6a23c; }
+  &.cancelled { color: #f56c6c; }
+  &.expired { color: #909399; }
+  &.loss { color: #f56c6c; }
+}
+
+// 搜索栏
+.search-bar {
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+  
+  .el-form-item {
+    margin-bottom: 0;
+  }
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #909399;
+}
+
+// 操作按钮区
+.operation-btns {
+  display: flex;
+  gap: 10px;
+}
