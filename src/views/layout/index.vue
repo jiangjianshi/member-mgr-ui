@@ -114,12 +114,13 @@
           <div class="collapse-btn" @click="isCollapse = !isCollapse">
             <el-icon><Fold v-if="!isCollapse" /><Expand v-else /></el-icon>
           </div>
-          <el-breadcrumb separator="/">
+          <el-breadcrumb separator="/" v-if="breadcrumbs.length > 0">
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index">
               {{ item.meta.title }}
             </el-breadcrumb-item>
           </el-breadcrumb>
+          <span v-else class="page-title">首页</span>
         </div>
         
         <div class="header-right">
@@ -129,12 +130,15 @@
           <el-dropdown @command="handleCommand">
             <span class="user-dropdown">
               <el-icon><User /></el-icon>
-              管理员
+              {{ currentUser?.name || '管理员' }}
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item disabled>
+                  {{ currentUser?.roleName || '员工' }}
+                </el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -185,6 +189,9 @@ import {
   Ticket, ShoppingBag, Fold, Expand, Close, MoreFilled
 } from '@element-plus/icons-vue'
 import { getStoreList } from '@/api/store'
+import { logout } from '@/api/auth'
+import { getUser, removeToken, removeUser } from '@/store/auth'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const route = useRoute()
 const router = useRouter()
@@ -194,10 +201,10 @@ const activeMenu = ref(route.path)
 const storeList = ref([])
 const currentStoreId = ref(null)
 const visitedViews = ref([])
+const currentUser = ref(null)
 
 const breadcrumbs = computed(() => {
-  const matched = route.matched.filter(item => item.meta && item.meta.title)
-  return matched.slice(1)
+  return route.matched.filter(item => item.meta && item.meta.title).slice(1)
 })
 
 const isActive = (tag) => {
@@ -209,9 +216,18 @@ const handleStoreChange = (value) => {
   localStorage.setItem('currentStoreId', value)
 }
 
-const handleCommand = (command) => {
+const handleCommand = async (command) => {
   if (command === 'logout') {
-    // TODO: 退出登录
+    try {
+      await ElMessageBox.confirm('确定要退出登录吗？', '提示', { type: 'warning' })
+      await logout()
+    } catch (e) {
+      // 用户取消不处理
+    }
+    removeToken()
+    removeUser()
+    ElMessage.success('已退出登录')
+    router.push('/login')
   }
 }
 
@@ -272,6 +288,7 @@ const fetchStores = async () => {
 }
 
 onMounted(() => {
+  currentUser.value = getUser()
   fetchStores()
   addViewTags()
 })
@@ -326,6 +343,7 @@ watch(() => route.path, () => {
   justify-content: space-between;
   padding: 0 20px;
   border-bottom: 1px solid #e6e6e6;
+  height: 60px;
   
   .header-left {
     display: flex;
@@ -338,6 +356,12 @@ watch(() => route.path, () => {
       &:hover {
         color: #409eff;
       }
+    }
+    
+    .page-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #303133;
     }
   }
   

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import router from '@/router'
+import { getToken, removeToken, removeUser } from '@/store/auth'
 
 const service = axios.create({
   baseURL: 'http://localhost:8080/api',
@@ -8,6 +10,10 @@ const service = axios.create({
 
 service.interceptors.request.use(
   config => {
+    const token = getToken()
+    if (token) {
+      config.headers['Authorization'] = 'Bearer ' + token
+    }
     return config
   },
   error => {
@@ -25,7 +31,14 @@ service.interceptors.response.use(
     return res
   },
   error => {
-    ElMessage.error(error.message || '网络错误')
+    if (error.response && error.response.status === 401) {
+      ElMessage.error('登录已过期，请重新登录')
+      removeToken()
+      removeUser()
+      router.push('/login')
+    } else {
+      ElMessage.error(error.message || '网络错误')
+    }
     return Promise.reject(error)
   }
 )

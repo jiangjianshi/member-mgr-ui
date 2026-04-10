@@ -1,10 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { isLoggedIn } from '@/store/auth'
 
 const routes = [
+  {
+    path: '/login',
+    name: '登录',
+    component: () => import('../views/login/index.vue'),
+    meta: { title: '登录', hidden: true }
+  },
   {
     path: '/',
     component: () => import('../views/layout/index.vue'),
     redirect: '/home',
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'home',
@@ -83,6 +91,23 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const isLogin = isLoggedIn()
+  
+  if (to.path === '/login') {
+    if (isLogin) {
+      next('/home')
+    } else {
+      next()
+    }
+  } else if (!isLogin) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router
