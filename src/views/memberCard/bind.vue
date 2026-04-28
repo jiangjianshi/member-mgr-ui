@@ -5,7 +5,25 @@
       
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px" style="margin-top: 30px; max-width: 600px">
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入会员手机号" @blur="handlePhoneBlur" />
+          <el-select
+            v-model="selectedMemberId"
+            filterable
+            remote
+            :remote-method="handleRemoteSearch"
+            :loading="searchLoading"
+            placeholder="请输入手机号搜索会员（至少4位）"
+            clearable
+            @change="onSelectMember"
+            @clear="onClearMember"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="m in searchResults"
+              :key="m.id"
+              :label="`${m.name} - ${m.phone}`"
+              :value="m.id"
+            />
+          </el-select>
         </el-form-item>
         
         <el-divider content-position="left">会员信息</el-divider>
@@ -68,7 +86,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { getMemberByPhone } from '@/api/member'
+import { searchMemberByPhone } from '@/api/member'
 import { getActiveCardTemplates, bindMemberCard } from '@/api/cardTemplate'
 import { ElMessage } from 'element-plus'
 
@@ -76,6 +94,9 @@ const formRef = ref()
 const loading = ref(false)
 const memberInfo = ref({})
 const templateList = ref([])
+const searchResults = ref([])
+const selectedMemberId = ref(null)
+const searchLoading = ref(false)
 
 const form = reactive({
   memberId: null,
@@ -88,8 +109,7 @@ const form = reactive({
 
 const rules = {
   phone: [
-    { required: true, message: '请输入手机号', trigger: 'blur' },
-    { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }
+    { required: true, message: '请搜索并选择会员', trigger: 'change' }
   ],
   templateId: [
     { required: true, message: '请选择卡模板', trigger: 'change' }
@@ -100,16 +120,41 @@ const selectedTemplate = computed(() => {
   return templateList.value.find(t => t.id === form.templateId)
 })
 
-const handlePhoneBlur = async () => {
-  if (!form.phone) return
-  try {
-    const res = await getMemberByPhone(form.phone)
-    memberInfo.value = res.data
-    form.memberId = res.data.id
-  } catch (e) {
-    memberInfo.value = {}
-    form.memberId = null
+let searchTimer = null
+
+const handleRemoteSearch = (query) => {
+  if (!query || query.length < 4) {
+    searchResults.value = []
+    return
   }
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(async () => {
+    searchLoading.value = true
+    try {
+      const res = await searchMemberByPhone(query)
+      searchResults.value = res.data || []
+    } catch (e) {
+      console.error(e)
+    } finally {
+      searchLoading.value = false
+    }
+  }, 300)
+}
+
+const onSelectMember = (id) => {
+  const member = searchResults.value.find(m => m.id === id)
+  if (member) {
+    memberInfo.value = member
+    form.memberId = member.id
+    form.phone = member.phone
+  }
+}
+
+const onClearMember = () => {
+  memberInfo.value = {}
+  form.memberId = null
+  form.phone = ''
+  searchResults.value = []
 }
 
 const handleTemplateChange = () => {
