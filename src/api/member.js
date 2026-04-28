@@ -6,6 +6,8 @@ export const getMemberDetail = (id) => request.get(`/member/${id}`)
 
 export const getMemberByPhone = (phone) => request.get(`/member/phone/${phone}`)
 
+export const searchMemberByPhone = (phone) => request.get('/member/search', { params: { phone } })
+
 export const registerMember = (data) => request.post('/member/register', data)
 
 export const updateMember = (data) => request.put('/member', data)

@@ -9,13 +9,28 @@
           <div class="panel-body">
             <el-form :inline="true">
               <el-form-item label="手机号">
-                <el-input v-model="searchPhone" placeholder="请输入手机号" @keyup.enter="handleSearchMember" />
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="handleSearchMember">查询</el-button>
+                <el-select
+                  v-model="selectedMemberId"
+                  filterable
+                  remote
+                  :remote-method="handleRemoteSearch"
+                  :loading="searchLoading"
+                  placeholder="请输入手机号搜索会员（至少4位）"
+                  clearable
+                  @change="onSelectMember"
+                  @clear="onClearMember"
+                  style="width: 340px"
+                >
+                  <el-option
+                    v-for="m in searchResults"
+                    :key="m.id"
+                    :label="`${m.name} - ${m.phone}`"
+                    :value="m.id"
+                  />
+                </el-select>
               </el-form-item>
             </el-form>
-            
+
             <div v-if="selectedMember" class="member-info">
               <el-descriptions :column="2" border>
                 <el-descriptions-item label="姓名">{{ selectedMember.name }}</el-descriptions-item>
@@ -55,12 +70,12 @@
           </div>
           <div class="panel-body">
             <el-table :data="serviceItems" border stripe max-height="300">
-              <el-table-column prop="name" label="项目名称" />
+              <el-table-column prop="name" label="项目名称" width="100" />
               <el-table-column prop="price" label="价格" width="100">
                 <template #default="{ row }">¥{{ row.price }}</template>
               </el-table-column>
-              <el-table-column prop="duration" label="时长" width="80">
-                <template #default="{ row }">{{ row.duration }}分钟</template>
+              <el-table-column label="时长" width="100">
+                <template #default="{ row }">{{ row.duration || 0 }}分钟</template>
               </el-table-column>
               <el-table-column label="操作" width="100">
                 <template #default="{ row }">
@@ -87,9 +102,9 @@
                 <el-table-column prop="price" label="单价" width="80">
                   <template #default="{ row }">¥{{ row.price }}</template>
                 </el-table-column>
-                <el-table-column prop="quantity" label="数量" width="100">
+                <el-table-column prop="quantity" label="数量" width="110">
                   <template #default="{ row, $index }">
-                    <el-input-number v-model="row.quantity" :min="1" :max="10" size="small" style="width: 80px" @change="updateCart(row, $index)" />
+                    <el-input-number v-model="row.quantity" :min="1" :max="10" size="small" style="width: 85px" @change="updateCart(row, $index)" />
                   </template>
                 </el-table-column>
                 <el-table-column label="小计" width="80">
@@ -125,21 +140,7 @@
                 <div class="method-title">支付方式</div>
                 <el-checkbox-group v-model="paymentMethods">
                   <el-checkbox label="card" :disabled="selectedCard.balance < needPayTotal">卡内支付 (可用 ¥{{ selectedCard.balance }})</el-checkbox>
-                  <el-checkbox label="cash">现金</el-checkbox>
-                  <el-checkbox label="wechat">微信</el-checkbox>
-                  <el-checkbox label="alipay">支付宝</el-checkbox>
                 </el-checkbox-group>
-                
-                <div v-if="paymentMethods.includes('card') && needPayTotal > selectedCard.balance" class="partial-pay">
-                  <div class="partial-info">卡内余额不足，还需支付: ¥{{ (needPayTotal - selectedCard.balance).toFixed(2) }}</div>
-                  <div v-if="paymentMethods.includes('cash')" class="cash-receive">
-                    <span>现金收款:</span>
-                    <el-input-number v-model="cashReceive" :min="0" :precision="2" />
-                  </div>
-                  <div v-if="paymentMethods.includes('cash') && cashReceive > 0" class="cash-change">
-                    找零: ¥{{ (cashReceive - (needPayTotal - selectedCard.balance)).toFixed(2) }}
-                  </div>
-                </div>
               </div>
               
               <div class="action-btns">
@@ -155,21 +156,22 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { getMemberByPhone } from '@/api/member'
+import { searchMemberByPhone } from '@/api/member'
 import { getMemberCardList } from '@/api/memberCard'
 import { getServiceItemList } from '@/api/serviceItem'
 import { doConsume } from '@/api/consume'
 import { ElMessage } from 'element-plus'
 
-const searchPhone = ref('')
 const selectedMember = ref(null)
 const memberCards = ref([])
 const selectedCardId = ref(null)
 const selectedCard = computed(() => memberCards.value.find(c => c.id === selectedCardId.value))
+const searchResults = ref([])
+const selectedMemberId = ref(null)
+const searchLoading = ref(false)
 const serviceItems = ref([])
 const cart = ref([])
-const paymentMethods = ref([])
-const cashReceive = ref(0)
+const paymentMethods = ref(['card'])
 const submitting = ref(false)
 
 const originalTotal = computed(() => cart.value.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0))
@@ -180,27 +182,61 @@ const needPayTotal = computed(() => {
   return originalTotal.value
 })
 
-const handleSearchMember = async () => {
-  if (!searchPhone.value) return
+let searchTimer = null
+
+const handleRemoteSearch = (query) => {
+  if (!query || query.length < 4) {
+    searchResults.value = []
+    return
+  }
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(async () => {
+    searchLoading.value = true
+    try {
+      const res = await searchMemberByPhone(query)
+      searchResults.value = res.data || []
+    } catch (e) {
+      console.error(e)
+    } finally {
+      searchLoading.value = false
+    }
+  }, 300)
+}
+
+const onClearMember = () => {
+  selectedMember.value = null
+  searchResults.value = []
+  selectedCardId.value = null
+  memberCards.value = []
+  cart.value = []
+  paymentMethods.value = ['card']
+}
+
+const onSelectMember = (id) => {
+  const member = searchResults.value.find(m => m.id === id)
+  if (member) selectMember(member)
+}
+
+const selectMember = async (member) => {
+  selectedMember.value = member
+  searchResults.value = []
+  selectedMemberId.value = null
+  selectedCardId.value = null
+  memberCards.value = []
+  cart.value = []
+  paymentMethods.value = ['card']
+
   try {
-    const res = await getMemberByPhone(searchPhone.value)
-    selectedMember.value = res.data
-    selectedCardId.value = null
-    memberCards.value = []
-    cart.value = []
-    paymentMethods.value = []
-    
-    const cardRes = await getMemberCardList({ memberId: res.data.id })
+    const cardRes = await getMemberCardList({ memberId: member.id })
     memberCards.value = cardRes.data.records.filter(c => c.status === 1)
   } catch (e) {
-    ElMessage.error('会员不存在')
-    selectedMember.value = null
+    console.error(e)
   }
 }
 
 const handleCardChange = () => {
   cart.value = []
-  paymentMethods.value = []
+  paymentMethods.value = ['card']
 }
 
 const fetchServiceItems = async () => {
@@ -238,18 +274,12 @@ const handleSubmit = async () => {
     ElMessage.warning('请选择支付方式')
     return
   }
-  
-  const cardPay = paymentMethods.value.includes('card')
-  const cardAmount = cardPay ? Math.min(selectedCard.value.balance, needPayTotal.value) : 0
-  const otherPay = needPayTotal.value - cardAmount
-  
-  if (cardPay && selectedCard.value.balance < needPayTotal.value) {
-    if (!paymentMethods.value.includes('cash') && !paymentMethods.value.includes('wechat') && !paymentMethods.value.includes('alipay')) {
-      ElMessage.warning('卡内余额不足，请选择其他支付方式')
-      return
-    }
+
+  if (selectedCard.value.cardType === 1 && selectedCard.value.balance < needPayTotal.value) {
+    ElMessage.warning('卡内余额不足')
+    return
   }
-  
+
   submitting.value = true
   try {
     await doConsume({
@@ -262,11 +292,11 @@ const handleSubmit = async () => {
       })),
       originalTotal: originalTotal.value,
       discountRate: selectedCard.value?.discountRate || 0,
-      paidAmount: cardAmount,
+      paidAmount: needPayTotal.value,
       paymentMethods: paymentMethods.value
     })
     ElMessage.success('收款成功')
-    handleSearchMember()
+    onClearMember()
   } catch (e) {
     console.error(e)
   } finally {
@@ -351,27 +381,6 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
-}
-.partial-pay {
-  margin-top: 15px;
-  padding: 15px;
-  background: #fef0f0;
-  border-radius: 4px;
-  .partial-info {
-    color: #f56c6c;
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-  .cash-receive {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .cash-change {
-    margin-top: 10px;
-    color: #67c23a;
-    font-weight: 600;
   }
 }
 .action-btns {
