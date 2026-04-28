@@ -89,7 +89,7 @@
                 </el-table-column>
                 <el-table-column prop="quantity" label="数量" width="100">
                   <template #default="{ row, $index }">
-                    <el-input-number v-model="row.quantity" :min="1" :max="10" size="small" @change="updateCart(row, $index)" />
+                    <el-input-number v-model="row.quantity" :min="1" :max="10" size="small" style="width: 80px" @change="updateCart(row, $index)" />
                   </template>
                 </el-table-column>
                 <el-table-column label="小计" width="80">
@@ -172,10 +172,10 @@ const paymentMethods = ref([])
 const cashReceive = ref(0)
 const submitting = ref(false)
 
-const originalTotal = computed(() => cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0))
+const originalTotal = computed(() => cart.value.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0), 0))
 const needPayTotal = computed(() => {
   if (selectedCard.value && selectedCard.value.discountRate > 0) {
-    return originalTotal.value * (1 - selectedCard.value.discountRate)
+    return originalTotal.value * selectedCard.value.discountRate
   }
   return originalTotal.value
 })
