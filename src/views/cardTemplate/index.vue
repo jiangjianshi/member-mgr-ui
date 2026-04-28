@@ -6,7 +6,7 @@
           <el-input v-model="searchForm.name" placeholder="请输入模板名称" clearable />
         </el-form-item>
         <el-form-item label="卡类型">
-          <el-select v-model="searchForm.cardType" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.cardType" placeholder="请选择" clearable style="width: 100px">
             <el-option label="储值卡" :value="1" />
             <el-option label="次卡" :value="2" />
             <el-option label="时限卡" :value="3" />

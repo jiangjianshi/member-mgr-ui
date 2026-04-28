@@ -9,7 +9,7 @@
           <el-input v-model="searchForm.name" placeholder="请输入姓名" clearable />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 100px">
             <el-option label="正常" :value="1" />
             <el-option label="冻结" :value="2" />
             <el-option label="注销" :value="3" />

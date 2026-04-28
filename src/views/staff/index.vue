@@ -9,7 +9,7 @@
           <el-input v-model="searchForm.phone" placeholder="请输入手机号" clearable />
         </el-form-item>
         <el-form-item label="角色">
-          <el-select v-model="searchForm.role" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.role" placeholder="请选择" clearable style="width: 100px">
             <el-option label="管理员" :value="1" />
             <el-option label="技师" :value="2" />
             <el-option label="收银员" :value="3" />
