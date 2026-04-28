@@ -55,8 +55,10 @@
               <el-radio v-for="card in memberCards" :key="card.id" :label="card.id" border class="card-radio">
                 <div class="card-info">
                   <div class="card-name">{{ card.templateName }}</div>
-                  <div class="card-balance">余额: ¥{{ card.balance }}</div>
-                  <div class="card-type">{{ card.cardType === 1 ? '储值卡' : '计次卡' }} - {{ card.status === 1 ? '正常' : card.status === 2 ? '挂失' : '已注销' }}</div>
+                  <div class="card-balance" v-if="card.cardType === 1">余额: ¥{{ card.balance }}</div>
+                  <div class="card-remaining" v-if="card.cardType === 2">剩余次数: {{ card.remainingTimes }}次</div>
+                  <div class="card-dates" v-if="card.cardType === 3">到期日: {{ card.expireDate || '-' }}</div>
+                  <div class="card-type">{{ card.cardType === 1 ? '储值卡' : card.cardType === 2 ? '次卡' : '时限卡' }} - {{ card.status === 1 ? '正常' : card.status === 2 ? '挂失' : '已注销' }}</div>
                 </div>
               </el-radio>
             </el-radio-group>
@@ -338,16 +340,32 @@ onMounted(() => {
   margin-bottom: 15px;
   height: auto;
   .card-info {
-    padding: 5px;
+    padding: 8px;
     line-height: 1.4;
+    min-height: 80px;
     .card-name {
       font-weight: 600;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .card-balance {
       color: #409eff;
       font-size: 18px;
       font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .card-remaining {
+      color: #409eff;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .card-dates {
+      color: #409eff;
+      font-size: 14px;
+      margin-bottom: 2px;
     }
     .card-type {
       font-size: 12px;
