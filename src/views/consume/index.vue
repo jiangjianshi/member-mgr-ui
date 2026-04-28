@@ -85,6 +85,16 @@
         <el-descriptions-item label="状态">{{ getStatusText(detailData.status) }}</el-descriptions-item>
         <el-descriptions-item label="消费次数" v-if="detailData.usedTimes > 0">{{ detailData.usedTimes }}次</el-descriptions-item>
       </el-descriptions>
+      <el-divider v-if="detailData?.items?.length">消费明细</el-divider>
+      <el-table v-if="detailData?.items?.length" :data="detailData.items" border stripe>
+        <el-table-column prop="serviceName" label="项目名称" />
+        <el-table-column prop="price" label="单价" width="80">
+          <template #default="{ row }">¥{{ row.price || 0 }}</template>
+        </el-table-column>
+        <el-table-column label="小计" width="100">
+          <template #default="{ row }">¥{{ row.subtotal || 0 }}</template>
+        </el-table-column>
+      </el-table>
     </el-dialog>
   </div>
 </template>
