@@ -24,7 +24,7 @@
     
     <div class="data-card">
       <el-table :data="tableData" v-loading="loading" stripe>
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" label="ID" width="60" />
         <el-table-column prop="memberPhone" label="会员手机" width="130">
           <template #default="{ row }">{{ maskPhone(row.memberPhone) }}</template>
         </el-table-column>
@@ -52,7 +52,7 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="100">
+        <el-table-column label="操作" fixed="right" width="120">
           <template #default="{ row }">
             <el-button type="primary" link @click="handleDetail(row)">详情</el-button>
             <el-button type="danger" link @click="handleUndo(row)" v-if="row.status === 1">撤销</el-button>
