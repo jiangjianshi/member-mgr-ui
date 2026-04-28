@@ -70,14 +70,14 @@
           </div>
           <div class="panel-body">
             <el-table :data="serviceItems" border stripe max-height="300">
-              <el-table-column prop="name" label="项目名称" width="100" />
+              <el-table-column prop="name" label="项目名称" min-width="100" />
               <el-table-column prop="price" label="价格" width="100">
                 <template #default="{ row }">¥{{ row.price }}</template>
               </el-table-column>
               <el-table-column label="时长" width="100">
                 <template #default="{ row }">{{ row.duration || 0 }}分钟</template>
               </el-table-column>
-              <el-table-column label="操作" width="100">
+              <el-table-column label="操作" width="60">
                 <template #default="{ row }">
                   <el-button type="primary" link @click="addToCart(row)">添加</el-button>
                 </template>
@@ -336,8 +336,10 @@ onMounted(() => {
 .card-radio {
   margin-right: 15px;
   margin-bottom: 15px;
+  height: auto;
   .card-info {
     padding: 5px;
+    line-height: 1.4;
     .card-name {
       font-weight: 600;
       margin-bottom: 5px;
