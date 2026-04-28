@@ -15,3 +15,5 @@ export const updateMember = (data) => request.put('/member', data)
 export const updateMemberStatus = (data) => request.put('/member/status', data)
 
 export const signIn = (id) => request.post(`/member/${id}/signIn`)
+
+export const getTodayNewMemberCount = () => request.get('/member/todayCount')

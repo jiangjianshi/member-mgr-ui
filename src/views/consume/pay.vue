@@ -298,7 +298,10 @@ const handleSubmit = async () => {
       paymentMethods: paymentMethods.value
     })
     ElMessage.success('收款成功')
-    onClearMember()
+    cart.value = []
+    selectedCardId.value = null
+    paymentMethods.value = ['card']
+    selectedMemberId.value = null
   } catch (e) {
     console.error(e)
   } finally {

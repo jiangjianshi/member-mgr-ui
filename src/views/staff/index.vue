@@ -122,7 +122,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { getStaffList, saveStaff, updateStaff, deleteStaff } from '@/api/staff'
+import { getStaffList, saveStaff, updateStaff, updateStaffStatus, deleteStaff } from '@/api/staff'
 import { getStoreList } from '@/api/store'
 import { getStaffPerformance } from '@/api/staff'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -242,7 +242,7 @@ const handleStatusChange = async (row) => {
   const action = newStatus === 1 ? '复职' : '离职'
   try {
     await ElMessageBox.confirm(`确定要${action}该员工吗？`, '提示', { type: 'warning' })
-    await updateStaff({ id: row.id, status: newStatus })
+    await updateStaffStatus(row.id, newStatus)
     ElMessage.success(`${action}成功`)
     fetchData()
   } catch (e) {

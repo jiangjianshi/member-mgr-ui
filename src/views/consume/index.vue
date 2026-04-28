@@ -25,11 +25,18 @@
     <div class="data-card">
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="memberPhone" label="会员手机" width="130" />
+        <el-table-column prop="memberPhone" label="会员手机" width="130">
+          <template #default="{ row }">{{ maskPhone(row.memberPhone) }}</template>
+        </el-table-column>
         <el-table-column prop="memberName" label="会员姓名" width="100" />
-        <el-table-column prop="cardName" label="会员卡" width="150" />
+        <el-table-column prop="cardName" label="会员卡" width="150">
+          <template #default="{ row }">
+            <span>{{ row.cardName }}</span>
+            <span style="color:#909399; font-size:12px; margin-left:4px">{{ cardTypeText(row.cardType) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="originalTotal" label="原价" width="100">
-          <template #default="{ row }">¥{{ row.originalTotal }}</template>
+          <template #default="{ row }">¥{{ row.originalTotal || 0 }}</template>
         </el-table-column>
         <el-table-column prop="discountRate" label="折扣" width="80">
           <template #default="{ row }">{{ row.discountRate > 0 ? (row.discountRate * 10).toFixed(1) + '折' : '无' }}</template>
@@ -68,25 +75,16 @@
     <el-dialog v-model="detailDialogVisible" title="消费详情" width="600px">
       <el-descriptions :column="2" border v-if="detailData">
         <el-descriptions-item label="订单编号">{{ detailData.id }}</el-descriptions-item>
-        <el-descriptions-item label="会员">{{ detailData.memberName }} ({{ detailData.memberPhone }})</el-descriptions-item>
-        <el-descriptions-item label="会员卡">{{ detailData.cardName }}</el-descriptions-item>
-        <el-descriptions-item label="消费时间">{{ detailData.createTime }}</el-descriptions-item>
-        <el-descriptions-item label="原价">{{ detailData.originalTotal }}</el-descriptions-item>
+        <el-descriptions-item label="会员">{{ detailData.memberName }} ({{ maskPhone(detailData.memberPhone) }})</el-descriptions-item>
+        <el-descriptions-item label="会员卡">{{ detailData.cardName }} ({{ cardTypeText(detailData.cardType) }})</el-descriptions-item>
+        <el-descriptions-item label="服务项目">{{ detailData.serviceItemName }}</el-descriptions-item>
+        <el-descriptions-item label="消费时间">{{ detailData.consumeTime }}</el-descriptions-item>
+        <el-descriptions-item label="原价">¥{{ detailData.originalTotal || 0 }}</el-descriptions-item>
         <el-descriptions-item label="折扣">{{ detailData.discountRate > 0 ? (detailData.discountRate * 10).toFixed(1) + '折' : '无' }}</el-descriptions-item>
-        <el-descriptions-item label="实收金额">{{ detailData.paidAmount }}</el-descriptions-item>
+        <el-descriptions-item label="实收金额">¥{{ detailData.paidAmount || 0 }}</el-descriptions-item>
         <el-descriptions-item label="状态">{{ getStatusText(detailData.status) }}</el-descriptions-item>
+        <el-descriptions-item label="消费次数" v-if="detailData.usedTimes > 0">{{ detailData.usedTimes }}次</el-descriptions-item>
       </el-descriptions>
-      <el-divider>消费项目</el-divider>
-      <el-table :data="detailData?.items || []" border stripe>
-        <el-table-column prop="serviceName" label="项目名称" />
-        <el-table-column prop="price" label="单价" width="80">
-          <template #default="{ row }">¥{{ row.price }}</template>
-        </el-table-column>
-        <el-table-column prop="quantity" label="数量" width="80" />
-        <el-table-column label="小计" width="100">
-          <template #default="{ row }">¥{{ (row.price * row.quantity).toFixed(2) }}</template>
-        </el-table-column>
-      </el-table>
     </el-dialog>
   </div>
 </template>
@@ -107,6 +105,16 @@ const detailData = ref(null)
 const getStatusText = (status) => {
   const map = { 1: '正常', 2: '已撤销' }
   return map[status] || '未知'
+}
+
+const maskPhone = (phone) => {
+  if (!phone || phone.length < 7) return phone || '-'
+  return phone.slice(0, 3) + '****' + phone.slice(7)
+}
+
+const cardTypeText = (type) => {
+  const map = { 1: '储值卡', 2: '次卡', 3: '时限卡' }
+  return map[type] || ''
 }
 
 const fetchData = async () => {

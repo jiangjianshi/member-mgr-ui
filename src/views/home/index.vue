@@ -74,8 +74,9 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { getMemberList } from '@/api/member'
-import { getConsumeList } from '@/api/consume'
+import { getMemberList, getTodayNewMemberCount } from '@/api/member'
+import { getConsumeList, getRevenue } from '@/api/consume'
+import { getTodayRechargeAmount } from '@/api/recharge'
 import { getMemberCardList } from '@/api/memberCard'
 
 const stats = ref({
@@ -102,16 +103,24 @@ const getPercent = (value) => {
 
 onMounted(async () => {
   try {
-    // 获取会员列表统计
-    const memberRes = await getMemberList({ page: 1, size: 1 })
+    const today = new Date().toISOString().slice(0, 10)
+
+    const [memberRes, todayMemberRes, consumeRes, revenueRes, rechargeRes, cardRes] =
+      await Promise.all([
+        getMemberList({ page: 1, size: 1 }),
+        getTodayNewMemberCount(),
+        getConsumeList({ page: 1, size: 5 }),
+        getRevenue({ start: today, end: today }),
+        getTodayRechargeAmount(),
+        getMemberCardList({ page: 1, size: 100 })
+      ])
+
     stats.value.memberTotal = memberRes.data.total
-    
-    // 获取最近消费记录
-    const consumeRes = await getConsumeList({ page: 1, size: 5 })
+    stats.value.todayNewMember = todayMemberRes.data
+    stats.value.todayConsume = revenueRes.data
+    stats.value.todayRecharge = rechargeRes.data
     recentConsumes.value = consumeRes.data.records
-    
-    // 获取会员卡统计
-    const cardRes = await getMemberCardList({ page: 1, size: 100 })
+
     const cards = cardRes.data.records
     cards.forEach(card => {
       if (card.status === 1) cardStats.value.normal = (cardStats.value.normal || 0) + 1

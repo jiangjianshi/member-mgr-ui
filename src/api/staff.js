@@ -8,6 +8,8 @@ export const saveStaff = (data) => request.post('/staff', data)
 
 export const updateStaff = (data) => request.put('/staff', data)
 
+export const updateStaffStatus = (id, status) => request.put(`/staff/${id}/status`, null, { params: { status } })
+
 export const deleteStaff = (id) => request.delete(`/staff/${id}`)
 
 export const getStaffPerformance = (staffId) => request.get(`/staff/${staffId}/performance`)
