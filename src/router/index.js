@@ -61,7 +61,7 @@ const routes = [
       },
       {
         path: 'consume',
-        meta: { title: '收银台', parent: '' },
+        meta: { title: '收银台', parent: '收银' },
         component: () => import('../views/consume/pay.vue')
       },
       {
@@ -76,7 +76,7 @@ const routes = [
       },
       {
         path: 'points',
-        meta: { title: '积分记录', parent: '' },
+        meta: { title: '积分记录', parent: '积分管理' },
         component: () => import('../views/points/index.vue')
       },
       {

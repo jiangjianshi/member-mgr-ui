@@ -114,13 +114,12 @@
           <div class="collapse-btn" @click="isCollapse = !isCollapse">
             <el-icon><Fold v-if="!isCollapse" /><Expand v-else /></el-icon>
           </div>
-          <el-breadcrumb separator="/" v-if="breadcrumbs.length > 0">
+          <el-breadcrumb separator="/">
             <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item v-for="(item, index) in breadcrumbs" :key="index">
               {{ item.meta.title }}
             </el-breadcrumb-item>
           </el-breadcrumb>
-          <span v-else class="page-title">首页</span>
         </div>
         
         <div class="header-right">
@@ -204,7 +203,16 @@ const visitedViews = ref([])
 const currentUser = ref(null)
 
 const breadcrumbs = computed(() => {
-  return route.matched.filter(item => item.meta && item.meta.title).slice(1)
+  const matched = route.matched.filter(item => item.meta && item.meta.title && item.path !== '/home' && item.path !== '/')
+  if (matched.length === 0) return []
+  const result = []
+  const last = matched[matched.length - 1]
+  if (last.meta.parent) {
+    const allRoutes = router.options.routes.flatMap(r => r.children || [])
+    const parent = allRoutes.find(r => r.meta.title === last.meta.parent)
+    if (parent) result.push({ meta: { title: parent.meta.title } })
+  }
+  return [...result, ...matched]
 })
 
 const isActive = (tag) => {
@@ -358,15 +366,15 @@ watch(() => route.path, () => {
     .collapse-btn {
       cursor: pointer;
       font-size: 18px;
+      display: flex;
+      align-items: center;
       &:hover {
         color: #409eff;
       }
     }
-    
-    .page-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: #303133;
+
+    .el-breadcrumb {
+      line-height: 1;
     }
   }
   
