@@ -44,6 +44,10 @@
         </el-form-item>
         
         <el-form-item>
+          <el-checkbox v-model="form.rememberMe">记住我</el-checkbox>
+        </el-form-item>
+        
+        <el-form-item>
           <el-button 
             type="primary" 
             size="large" 
@@ -131,6 +135,13 @@ const handleLogin = async () => {
     })
     
     ElMessage.success('登录成功')
+
+    if (form.rememberMe) {
+      localStorage.setItem('rememberedPhone', form.phone)
+    } else {
+      localStorage.removeItem('rememberedPhone')
+    }
+
     router.push('/home')
   } catch (e) {
     // 登录失败刷新验证码
@@ -142,6 +153,11 @@ const handleLogin = async () => {
 }
 
 onMounted(() => {
+  const savedPhone = localStorage.getItem('rememberedPhone')
+  if (savedPhone) {
+    form.phone = savedPhone
+    form.rememberMe = true
+  }
   refreshCaptcha()
 })
 </script>

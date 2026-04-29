@@ -392,7 +392,8 @@ watch(() => route.path, () => {
       align-items: center;
       gap: 5px;
       cursor: pointer;
-      padding: 5px 10px;
+      padding: 0 10px;
+      height: 32px;
       border-radius: 4px;
       
       &:hover {
