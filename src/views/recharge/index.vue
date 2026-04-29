@@ -25,9 +25,16 @@
     <div class="data-card">
       <el-table :data="tableData" v-loading="loading" stripe>
         <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="memberPhone" label="会员手机" width="130" />
+        <el-table-column prop="memberPhone" label="会员手机" width="130">
+          <template #default="{ row }">{{ maskPhone(row.memberPhone) }}</template>
+        </el-table-column>
         <el-table-column prop="memberName" label="会员姓名" width="100" />
-        <el-table-column prop="cardName" label="会员卡" width="150" />
+        <el-table-column prop="cardName" label="会员卡" width="150">
+          <template #default="{ row }">
+            <span>{{ row.cardName }}</span>
+            <span style="color:#909399; font-size:12px; margin-left:4px">{{ cardTypeText(row.cardType) }}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="amount" label="充值金额" width="100">
           <template #default="{ row }">
             <span class="amount-plus">+¥{{ row.amount }}</span>
@@ -42,7 +49,7 @@
         <el-table-column prop="createTime" label="充值时间" width="180" />
         <el-table-column prop="payMethod" label="支付方式" width="100">
           <template #default="{ row }">
-            <el-tag>{{ getPayMethodText(row.payMethod) }}</el-tag>
+            <el-tag>{{ row.payMethodName || getPayMethodText(row.payMethod) }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="80">
@@ -67,11 +74,11 @@
     <el-dialog v-model="detailDialogVisible" title="充值详情" width="500px">
       <el-descriptions :column="1" border v-if="detailData">
         <el-descriptions-item label="订单编号">{{ detailData.id }}</el-descriptions-item>
-        <el-descriptions-item label="会员">{{ detailData.memberName }} ({{ detailData.memberPhone }})</el-descriptions-item>
-        <el-descriptions-item label="会员卡">{{ detailData.cardName }}</el-descriptions-item>
+        <el-descriptions-item label="会员">{{ detailData.memberName }} ({{ maskPhone(detailData.memberPhone) }})</el-descriptions-item>
+        <el-descriptions-item label="会员卡">{{ detailData.cardName }} ({{ cardTypeText(detailData.cardType) }})</el-descriptions-item>
         <el-descriptions-item label="充值金额">¥{{ detailData.amount }}</el-descriptions-item>
         <el-descriptions-item label="赠送金额">{{ detailData.giftAmount > 0 ? '¥' + detailData.giftAmount : '无' }}</el-descriptions-item>
-        <el-descriptions-item label="支付方式">{{ getPayMethodText(detailData.payMethod) }}</el-descriptions-item>
+        <el-descriptions-item label="支付方式">{{ detailData.payMethodName || getPayMethodText(detailData.payMethod) }}</el-descriptions-item>
         <el-descriptions-item label="充值时间">{{ detailData.createTime }}</el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -92,8 +99,18 @@ const detailDialogVisible = ref(false)
 const detailData = ref(null)
 
 const getPayMethodText = (method) => {
-  const map = { cash: '现金', wechat: '微信', alipay: '支付宝', bank: '银行卡' }
-  return map[method] || method
+  const map = { 1: '现金', 2: '微信', 3: '支付宝', 4: '银行转账' }
+  return map[method] || '-'
+}
+
+const maskPhone = (phone) => {
+  if (!phone || phone.length < 7) return phone || '-'
+  return phone.slice(0, 3) + '****' + phone.slice(7)
+}
+
+const cardTypeText = (type) => {
+  const map = { 1: '储值卡', 2: '次卡', 3: '时限卡' }
+  return map[type] || ''
 }
 
 const fetchData = async () => {
