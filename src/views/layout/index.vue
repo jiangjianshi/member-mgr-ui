@@ -307,10 +307,13 @@ watch(() => route.path, () => {
 .sidebar {
   background: #304156;
   transition: all 0.3s;
-  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   
   .logo {
     height: 60px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -325,6 +328,8 @@ watch(() => route.path, () => {
   
   .el-menu {
     border: none;
+    flex: 1;
+    overflow-y: auto;
     
     &:not(.el-menu--collapse) {
       width: 220px;
