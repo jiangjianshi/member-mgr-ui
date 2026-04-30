@@ -59,17 +59,17 @@
       </el-descriptions>
       <el-divider>积分记录</el-divider>
       <el-table :data="logList" max-height="300" stripe>
-        <el-table-column prop="type" label="类型" width="100">
+        <el-table-column prop="sourceDesc" label="类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.type === 1 ? 'success' : row.type === 2 ? 'warning' : 'info'">
-              {{ getTypeText(row.type) }}
+            <el-tag :type="row.change > 0 ? 'success' : 'warning'">
+              {{ row.sourceDesc }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="points" label="积分" width="100">
+        <el-table-column prop="change" label="积分" width="100">
           <template #default="{ row }">
-            <span :class="row.type === 1 ? 'points-plus' : 'points-minus'">
-              {{ row.type === 1 ? '+' : '-' }}{{ Math.abs(row.points) }}
+            <span :class="row.change > 0 ? 'points-plus' : 'points-minus'">
+              {{ row.change > 0 ? '+' : '' }}{{ row.change }}
             </span>
           </template>
         </el-table-column>
@@ -169,11 +169,6 @@ const adjustRules = {
   reason: [{ required: true, message: '请输入原因', trigger: 'blur' }]
 }
 
-const getTypeText = (type) => {
-  const map = { 1: '获得', 2: '扣减', 3: '兑换' }
-  return map[type] || '未知'
-}
-
 const fetchData = async () => {
   loading.value = true
   try {
@@ -190,8 +185,12 @@ const handleReset = () => { searchForm.phone = ''; searchForm.name = ''; handleS
 const handleDetail = async (row) => {
   try {
     const res = await getPointsLogs(row.id)
-    detailData.value = row
-    logList.value = res.data
+    const logs = res.data || []
+    detailData.value = { 
+      ...row, 
+      totalEarned: logs.filter(l => l.change > 0).reduce((s, l) => s + l.change, 0)
+    }
+    logList.value = logs
     detailDialogVisible.value = true
   } catch (e) { console.error(e) }
 }
