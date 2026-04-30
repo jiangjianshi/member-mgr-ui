@@ -6,9 +6,9 @@
           <el-input v-model="searchForm.name" placeholder="请输入商品名称" clearable />
         </el-form-item>
         <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择" clearable>
+          <el-select v-model="searchForm.status" placeholder="请选择" clearable style="width: 100px">
             <el-option label="上架" :value="1" />
-            <el-option label="下架" :value="2" />
+            <el-option label="下架" :value="0" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -159,7 +159,7 @@ const handleSubmit = async () => {
 }
 
 const handleStatusChange = async (row) => {
-  const newStatus = row.status === 1 ? 2 : 1
+  const newStatus = row.status === 1 ? 0 : 1
   const action = newStatus === 1 ? '上架' : '下架'
   try {
     await updatePointsGoods({ id: row.id, status: newStatus })
