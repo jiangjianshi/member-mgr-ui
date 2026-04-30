@@ -14,6 +14,10 @@ service.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = 'Bearer ' + token
     }
+    const storeId = localStorage.getItem('currentStoreId')
+    if (storeId) {
+      config.headers['X-Store-Id'] = storeId
+    }
     return config
   },
   error => {

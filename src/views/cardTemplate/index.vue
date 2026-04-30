@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getCardTemplateList, saveCardTemplate, updateCardTemplate, deleteCardTemplate } from '@/api/cardTemplate'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -200,4 +200,12 @@ const handleDelete = async (row) => {
 }
 
 onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>

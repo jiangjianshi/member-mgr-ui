@@ -136,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, onActivated, onDeactivated } from 'vue'
 import { getMemberList, signIn as memberSignIn } from '@/api/member'
 import { getPointsLogs, exchangePoints, adjustPoints } from '@/api/points'
 import { getPointsGoodsList } from '@/api/points'
@@ -257,6 +257,14 @@ const handleAdjustSubmit = async () => {
 }
 
 onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>
 
 <style scoped lang="scss">

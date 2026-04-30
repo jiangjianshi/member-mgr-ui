@@ -92,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getServiceItemList, saveServiceItem, updateServiceItem, deleteServiceItem } from '@/api/serviceItem'
 import { getStoreList } from '@/api/store'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -180,7 +180,18 @@ const handleDelete = async (row) => {
   } catch (e) { if (e !== 'cancel') console.error(e) }
 }
 
-onMounted(() => { fetchData(); fetchStores() })
+onMounted(() => {
+  fetchData()
+  fetchStores()
+})
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>
 
 <style scoped lang="scss">

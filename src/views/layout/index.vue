@@ -222,6 +222,7 @@ const isActive = (tag) => {
 const handleStoreChange = (value) => {
   currentStoreId.value = value
   localStorage.setItem('currentStoreId', value)
+  window.dispatchEvent(new CustomEvent('store-changed'))
 }
 
 const handleCommand = async (command) => {

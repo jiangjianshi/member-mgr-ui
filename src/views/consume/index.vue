@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getConsumeList, getConsumeDetail, undoConsume } from '@/api/consume'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -165,6 +165,14 @@ const handleUndo = async (row) => {
 }
 
 onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>
 
 <style scoped lang="scss">

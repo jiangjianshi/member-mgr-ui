@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onActivated, onDeactivated, computed } from 'vue'
 import { getMemberList, getTodayNewMemberCount } from '@/api/member'
 import { getConsumeList, getRevenue } from '@/api/consume'
 import { getTodayRechargeAmount } from '@/api/recharge'
@@ -101,7 +101,7 @@ const getPercent = (value) => {
   return Math.round((value || 0) / totalCards.value * 100)
 }
 
-onMounted(async () => {
+const fetchDashboard = async () => {
   try {
     const today = new Date().toISOString().slice(0, 10)
 
@@ -122,15 +122,26 @@ onMounted(async () => {
     recentConsumes.value = consumeRes.data.records
 
     const cards = cardRes.data.records
+    cardStats.value = { normal: 0, expired: 0, loss: 0, cancelled: 0 }
     cards.forEach(card => {
-      if (card.status === 1) cardStats.value.normal = (cardStats.value.normal || 0) + 1
-      else if (card.status === 2) cardStats.value.expired = (cardStats.value.expired || 0) + 1
-      else if (card.status === 3) cardStats.value.loss = (cardStats.value.loss || 0) + 1
-      else if (card.status === 4) cardStats.value.cancelled = (cardStats.value.cancelled || 0) + 1
+      if (card.status === 1) cardStats.value.normal++
+      else if (card.status === 2) cardStats.value.expired++
+      else if (card.status === 3) cardStats.value.loss++
+      else if (card.status === 4) cardStats.value.cancelled++
     })
   } catch (e) {
     console.error(e)
   }
+}
+
+onMounted(() => { fetchDashboard() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchDashboard)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchDashboard)
 })
 </script>
 

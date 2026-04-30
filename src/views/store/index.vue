@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getStoreList, saveStore, updateStore, deleteStore } from '@/api/store'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -98,4 +98,12 @@ const handleDelete = async (row) => {
 }
 
 onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>

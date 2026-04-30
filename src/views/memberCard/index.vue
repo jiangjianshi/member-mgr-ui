@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getMemberCardList, reportLoss, unblock, cancelCard } from '@/api/memberCard'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -139,7 +139,13 @@ const handleCancel = async (row) => {
   }
 }
 
-onMounted(() => {
-  fetchData()
+onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
 })
 </script>

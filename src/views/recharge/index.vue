@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getRechargeList, getRechargeDetail } from '@/api/recharge'
 import { ElMessage } from 'element-plus'
 
@@ -142,6 +142,14 @@ const handleDetail = async (row) => {
 }
 
 onMounted(() => { fetchData() })
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
+})
 </script>
 
 <style scoped lang="scss">

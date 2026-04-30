@@ -121,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onActivated, onDeactivated } from 'vue'
 import { getStaffList, saveStaff, updateStaff, updateStaffStatus, deleteStaff } from '@/api/staff'
 import { getStoreList } from '@/api/store'
 import { getStaffPerformance } from '@/api/staff'
@@ -263,6 +263,14 @@ const handlePerformance = async (row) => {
 onMounted(() => {
   fetchData()
   fetchStores()
+})
+
+onActivated(() => {
+  window.addEventListener('store-changed', fetchData)
+})
+
+onDeactivated(() => {
+  window.removeEventListener('store-changed', fetchData)
 })
 </script>
 
