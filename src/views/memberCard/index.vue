@@ -16,7 +16,7 @@
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
-          <el-button type="success" @click="$router.push('/memberCard/bind')">绑定新卡</el-button>
+          <el-button type="success" @click="$router.push('/memberCard/bind')">创建新卡</el-button>
         </el-form-item>
       </el-form>
     </div>

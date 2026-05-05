@@ -36,7 +36,7 @@ const routes = [
       },
       {
         path: 'memberCard/bind',
-        meta: { title: '绑定新卡', parent: '会员卡管理' },
+        meta: { title: '创建新卡', parent: '会员卡管理' },
         component: () => import('../views/memberCard/bind.vue')
       },
       {

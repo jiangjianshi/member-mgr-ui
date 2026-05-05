@@ -47,7 +47,7 @@
           </el-menu-item>
           <el-menu-item index="/memberCard/bind">
             <el-icon><Plus /></el-icon>
-            <span>绑定新卡</span>
+            <span>创建新卡</span>
           </el-menu-item>
         </el-sub-menu>
         

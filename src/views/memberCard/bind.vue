@@ -1,7 +1,7 @@
 <template>
   <div class="bind-card-page">
     <div class="form-container">
-      <el-page-header @back="$router.back()" content="绑定新卡" />
+      <el-page-header @back="$router.back()" content="创建新卡" />
       
       <el-form :model="form" :rules="rules" ref="formRef" label-width="100px" style="margin-top: 30px; max-width: 600px">
         <el-form-item label="手机号" prop="phone">
@@ -37,7 +37,7 @@
           </el-tag>
         </el-form-item>
         
-        <el-divider content-position="left">绑卡信息</el-divider>
+        <el-divider content-position="left">创建信息</el-divider>
         
         <el-form-item label="选择卡模板" prop="templateId">
           <el-select v-model="form.templateId" placeholder="请选择卡模板" @change="handleTemplateChange" style="width: 100%">
@@ -76,7 +76,7 @@
         </el-form-item>
         
         <el-form-item>
-          <el-button type="primary" @click="handleSubmit" :loading="loading">确认绑卡</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="loading">确认创建</el-button>
           <el-button @click="$router.back()">取消</el-button>
         </el-form-item>
       </el-form>
@@ -175,7 +175,7 @@ const handleSubmit = async () => {
   loading.value = true
   try {
     await bindMemberCard(form)
-    ElMessage.success('绑卡成功')
+    ElMessage.success('创建成功')
     setTimeout(() => {
       // router.push('/memberCard')
     }, 500)
