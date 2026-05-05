@@ -5,7 +5,7 @@ import { getToken, removeToken, removeUser } from '@/store/auth'
 
 const service = axios.create({
   //baseURL: 'http://localhost:8080/api',
-  baseURL: 'http://182.92.96.191/:8080/api',
+  baseURL: 'http://182.92.96.191/api',
   timeout: 10000
 })
 
