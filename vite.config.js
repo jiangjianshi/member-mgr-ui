@@ -12,6 +12,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // 允许外部访问
     port: 5173,      // 指定端口号（可选）
-    open: true       // 自动打开浏览器（可选）
+    open: false       // 自动打开浏览器（可选）
   }
 })
