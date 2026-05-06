@@ -235,6 +235,7 @@ const handleCommand = async (command) => {
     }
     removeToken()
     removeUser()
+    localStorage.removeItem('currentStoreId')
     ElMessage.success('已退出登录')
     router.push('/login')
   }

@@ -4,8 +4,8 @@ import router from '@/router'
 import { getToken, removeToken, removeUser } from '@/store/auth'
 
 const service = axios.create({
-  //baseURL: 'http://localhost:8080/api',
-  baseURL: 'http://182.92.96.191/api',
+  baseURL: 'http://localhost:8080/api',
+  //baseURL: 'http://182.92.96.191/api',
   timeout: 10000
 })
 
@@ -41,6 +41,7 @@ service.interceptors.response.use(
       ElMessage.error('登录已过期，请重新登录')
       removeToken()
       removeUser()
+      localStorage.removeItem('currentStoreId')
       router.push('/login')
     } else {
       ElMessage.error(error.message || '网络错误')
