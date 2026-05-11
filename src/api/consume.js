@@ -9,3 +9,5 @@ export const doConsume = (data) => request.post('/consume', data)
 export const undoConsume = (id) => request.post(`/consume/${id}/undo`)
 
 export const getRevenue = (params) => request.get('/consume/revenue', { params })
+
+export const getTodayConsumeCount = () => request.get('/consume/todayCount')
