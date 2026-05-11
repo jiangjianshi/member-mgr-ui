@@ -16,11 +16,11 @@
         text-color="#bfcbd9"
         active-text-color="#409eff"
       >
-        <el-menu-item index="/home">
+        <el-menu-item v-if="isAdmin" index="/home">
           <el-icon><DataAnalysis /></el-icon>
           <span>首页</span>
         </el-menu-item>
-        
+
         <el-sub-menu index="/member">
           <template #title>
             <el-icon><User /></el-icon>
@@ -51,22 +51,22 @@
           </el-menu-item>
         </el-sub-menu>
         
-        <el-menu-item index="/cardTemplate">
+        <el-menu-item v-if="isAdmin" index="/cardTemplate">
           <el-icon><Tickets /></el-icon>
           <span>卡模板</span>
         </el-menu-item>
-        
-        <el-menu-item index="/store">
+
+        <el-menu-item v-if="isAdmin" index="/store">
           <el-icon><Shop /></el-icon>
           <span>门店管理</span>
         </el-menu-item>
-        
-        <el-menu-item index="/staff">
+
+        <el-menu-item v-if="isAdmin" index="/staff">
           <el-icon><UserFilled /></el-icon>
           <span>员工管理</span>
         </el-menu-item>
-        
-        <el-menu-item index="/serviceItem">
+
+        <el-menu-item v-if="isAdmin" index="/serviceItem">
           <el-icon><SetUp /></el-icon>
           <span>服务项目</span>
         </el-menu-item>
@@ -201,6 +201,8 @@ const storeList = ref([])
 const currentStoreId = ref(null)
 const visitedViews = ref([])
 const currentUser = ref(null)
+
+const isAdmin = computed(() => currentUser.value?.role === 1)
 
 const breadcrumbs = computed(() => {
   const matched = route.matched.filter(item => item.meta && item.meta.title && item.path !== '/home' && item.path !== '/')
