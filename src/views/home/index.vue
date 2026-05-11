@@ -121,7 +121,7 @@ const fetchDashboard = async () => {
       await Promise.all([
         getMemberList({ page: 1, size: 1 }),
         getTodayNewMemberCount(),
-        getConsumeList({ page: 1, size: 5 }),
+        getConsumeList({ page: 1, size: 7 }),
         getRevenue({ start: today, end: today }),
         getTodayRechargeAmount(),
         getMemberCardList({ page: 1, size: 100 }),
