@@ -4,8 +4,8 @@ import router from '@/router'
 import { getToken, removeToken, removeUser } from '@/store/auth'
 
 const service = axios.create({
-  //baseURL: 'http://localhost:8080/api',
-  baseURL: 'http://182.92.96.191/api',
+  // 生产环境走相对路径 /api，由 Nginx 反向代理到后端
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 10000
 })
 
